@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,7 +13,17 @@ import (
 var puzzle = "./puzzles/easy1.puzzle"
 
 func main() {
-	solveAll()
+	pFile := flag.String("pFile", "", "If given, will only solve the puzzle at the given file")
+	flag.Parse()
+	if *pFile != "" {
+		solveSingle(*pFile)
+	} else {
+		solveAll()
+	}
+}
+
+func solveSingle(fileName string) {
+	solvePuzzle(fileName)
 }
 
 func solveAll() {
