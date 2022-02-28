@@ -3,6 +3,7 @@ package bruteforce
 import (
 	"fmt"
 	"sudokuSolver/board"
+	"time"
 )
 
 var _logAttempts = false
@@ -18,6 +19,9 @@ type Solver struct {
 	numValueAttempts      int
 	numValidValueAttempts int
 	numRollbacks          int
+
+	startTime time.Time
+	timeTaken time.Duration
 }
 
 func NewSolver(board *board.Board) *Solver {
@@ -35,6 +39,21 @@ func NewSolver(board *board.Board) *Solver {
 }
 
 func (s *Solver) Solve() bool {
+	s.startTime = time.Now()
+	isFinished := s._makeMove()
+	for !isFinished {
+		isFinished = s._makeMove()
+	}
+	s.timeTaken = time.Since(s.startTime) // * time.Second
+	return s.board.IsSolved()
+
+}
+
+//__makeMove() returns true if the board is in a terminal state (solved or unsolvable), else returns false
+func (s *Solver) _makeMove() bool {
+	if s.currentTrackersPos == -1 {
+		return true
+	}
 	tracker := s.cellTrackers[s.currentTrackersPos]
 	va := tracker.nextAttempt()
 	if va != nil {
@@ -46,11 +65,9 @@ func (s *Solver) Solve() bool {
 			}
 			s._nextTracker()
 		}
-		s.Solve()
 	} else {
 		s._undoLastAttempt()
 		s._removeTracker()
-		s.Solve()
 	}
 	return false
 }
@@ -120,6 +137,7 @@ func (s *Solver) LogSolution() {
 	fmt.Printf("=assingedValueAttempts=%d=\n", s.numValueAttempts)
 	fmt.Printf("=validAssignedValues=%d===\n", s.numValueAttempts)
 	fmt.Printf("=numRollbacks=%d==========\n", s.numRollbacks)
+	fmt.Printf("timeTaken=%s", s.timeTaken)
 	fmt.Printf("==========================\n")
 	fmt.Printf("=========[BOARD]==========\n")
 	fmt.Printf("%s", s.board)

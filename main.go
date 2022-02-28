@@ -41,8 +41,7 @@ func solvePuzzle(puzzleFile string) {
 	board := util.LoadPuzzle(puzzleFile)
 	board2.SetDebug(board)
 	solver := bruteforce.NewSolver(board)
-	solver.Solve()
-	isSolved := solver.ValidateSolution()
+	isSolved := solver.Solve()
 	if isSolved {
 		solver.LogSolution()
 	} else {
